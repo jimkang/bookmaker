@@ -1,5 +1,7 @@
 var seedrandom = require('seedrandom');
 var Probable = require('probable').createProbable;
+var range = require('d3-array').range;
+var renderJoints = require('../dom/render-joints');
 
 function PageFlow({ seed }) {
   var random = seedrandom(seed);
@@ -10,6 +12,9 @@ function PageFlow({ seed }) {
     jointStep,
     boneStep
   ];
+
+  var page = {
+  };
 
   return pageFlow;
 
@@ -28,11 +33,17 @@ function PageFlow({ seed }) {
   }
 
   function jointStep() {
-    console.log('joint', probable.roll(6));
+    page.joints = range(100).map(getRandomPoint);
+    console.log('page.joints', page.joints);
+    renderJoints(page.joints);
   }
 
   function boneStep() {
     console.log('bone', probable.roll(6));
+  }
+
+  function getRandomPoint() {
+    return [probable.roll(1000)/10, probable.roll(1000)/10];
   }
 }
 

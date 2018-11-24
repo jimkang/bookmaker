@@ -21,8 +21,12 @@ function followRoute({ stepMode, seed }) {
   }
 
   var pageFlow = PageFlow({ seed });
-  wireControls({ pageFlow });
+  wireControls({ pageFlow, clearSeed });
   pageFlow({ stepMode });
+}
+
+function clearSeed() {
+  routeState.addToRoute({ seed: '' });
 }
 
 function reportTopLevelError(msg, url, lineNo, columnNo, error) {
