@@ -1,0 +1,32 @@
+{
+  "name": "bookmaker",
+  "version": "1.0.0",
+  "description": "Makes a book!",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jimkang/bookmaker.git"
+  },
+  "keywords": [],
+  "author": "Jim Kang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jimkang/bookmaker/issues"
+  },
+  "homepage": "https://github.com/jimkang/bookmaker",
+  "devDependencies": {
+    "browserify": "^14.5.0",
+    "uglify-es": "^3.1.9"
+  },
+  "dependencies": {
+    "handle-error-web": "^1.0.1",
+    "probable": "^2.1.2",
+    "route-state": "^1.2.0",
+    "seedrandom": "^2.4.4",
+    "standard-bail": "^2.0.1"
+  }
+}
