@@ -5,7 +5,9 @@ var jointsRoot = d3.select('#joints');
 
 function renderJoints(joints) {
   jointsRoot.selectAll('circle').remove();
-  jointsRoot.selectAll('circle').data(joints)
+  jointsRoot
+    .selectAll('circle')
+    .data(joints)
     .enter()
     .append('circle')
     .attr('r', 1)
@@ -14,4 +16,3 @@ function renderJoints(joints) {
 }
 
 module.exports = renderJoints;
-

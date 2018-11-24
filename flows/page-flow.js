@@ -10,13 +10,9 @@ function PageFlow({ seed }) {
   var probable = Probable({ random });
   var stepIndex = 0;
 
-  var steps = [
-    jointStep,
-    boneStep
-  ];
+  var steps = [jointStep, boneStep];
 
-  var page = {
-  };
+  var page = {};
 
   return pageFlow;
 
@@ -43,11 +39,15 @@ function PageFlow({ seed }) {
   function boneStep() {
     var graph = getNByNGraph({ points: page.joints });
     console.log(graph);
-    renderEdges({ edges: graph, className: 'n-by-n-edge', rootSelector: '#n-by-n-graph' });
+    renderEdges({
+      edges: graph,
+      className: 'n-by-n-edge',
+      rootSelector: '#n-by-n-graph'
+    });
   }
 
   function getRandomPoint() {
-    return [probable.roll(1000)/10, probable.roll(1000)/10];
+    return [probable.roll(1000) / 10, probable.roll(1000) / 10];
   }
 }
 

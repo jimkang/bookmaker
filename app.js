@@ -15,7 +15,7 @@ var routeState = RouteState({
 
 function followRoute({ stepMode, seed }) {
   if (!seed) {
-    seed = (new Date()).toISOString();
+    seed = new Date().toISOString();
     routeState.addToRoute({ seed });
     return;
   }
@@ -32,4 +32,3 @@ function clearSeed() {
 function reportTopLevelError(msg, url, lineNo, columnNo, error) {
   handleError(error);
 }
-
