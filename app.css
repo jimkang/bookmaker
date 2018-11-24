@@ -42,6 +42,11 @@ button {
   box-shadow: #444 0 0 4px;
 }
 
+.n-by-n-edge {
+  stroke: hsl(180, 40%, 75%);
+  stroke-width: 0.1;
+}
+
 @media all and (max-height: 568px) {
   body {
     font-size: 18px;
