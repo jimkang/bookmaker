@@ -1,17 +1,18 @@
 var seedrandom = require('seedrandom');
 var Probable = require('probable').createProbable;
 var range = require('d3-array').range;
-var renderJoints = require('../dom/render-joints');
+var renderPoints = require('../dom/render-points');
 var renderEdges = require('../dom/render-edges');
 var math = require('basic-2d-math');
 var jsgraphs = require('js-graph-algorithms');
+var Enmeaten = require('enmeaten');
 
 function PageFlow({ seed }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
   var stepIndex = 0;
 
-  var steps = [jointStep, boneStep];
+  var steps = [jointStep, boneStep, nodeStep, limbStep, enmeatenStep];
 
   var page = {};
 
@@ -34,7 +35,11 @@ function PageFlow({ seed }) {
   function jointStep() {
     page.joints = range(100).map(getRandomPoint);
     //console.log('page.joints', page.joints);
-    renderJoints(page.joints);
+    renderPoints({
+      points: page.joints,
+      className: 'joint',
+      rootSelector: '#joints'
+    });
   }
 
   function boneStep() {
@@ -55,6 +60,54 @@ function PageFlow({ seed }) {
 
   function getRandomPoint() {
     return [probable.roll(1000) / 10, probable.roll(1000) / 10];
+  }
+
+  function nodeStep() {
+    page.nodes = {};
+    page.bones.forEach(updateNodesConnectedToBone);
+    renderPoints({
+      points: Object.values(page.nodes),
+      className: 'node',
+      rootSelector: '#nodes',
+      labelAccessor: getLinkCount
+    });
+
+    function updateNodesConnectedToBone(bone) {
+      updateNode(bone.start, bone.dest);
+      updateNode(bone.dest, bone.start);
+    }
+
+    function updateNode(jointIndex, destJointIndex) {
+      var nodeId = getNodeIdForJointIndex(jointIndex);
+      var node = page.nodes[nodeId];
+      if (!node) {
+        let joint = page.joints[jointIndex];
+        node = {
+          id: nodeId,
+          links: [],
+          bones: [],
+          0: joint[0],
+          1: joint[1]
+        };
+        page.nodes[nodeId] = node;
+      }
+      var linkedNodeId = getNodeIdForJointIndex(destJointIndex);
+      if (node.links.indexOf(linkedNodeId) === -1) {
+        node.links.push(linkedNodeId);
+      }
+    }
+  }
+
+  function getNodeIdForJointIndex(index) {
+    return page.joints[index].join('_');
+  }
+
+  function limbStep() {}
+
+  function enmeatenStep() {
+    var enmeaten = Enmeaten({ random });
+    //var meatPoints = enmeaten({
+    //});
   }
 }
 
@@ -103,6 +156,10 @@ function getMST({ graph, points }) {
       y2: points[dest][1]
     };
   }
+}
+
+function getLinkCount(node) {
+  return node.links.length;
 }
 
 module.exports = PageFlow;

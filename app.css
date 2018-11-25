@@ -1,9 +1,6 @@
 body {
   font-size: 24pt;
   font-family: futura, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   background-color: black;
   color: #444;
   height: 100%;
@@ -54,6 +51,17 @@ button {
 .bone {
   stroke: hsl(140, 70%, 50%);
   stroke-width: 0.1;
+}
+
+.node circle {
+  stroke: hsl(10, 70%, 50%);
+  stroke-width: 0.2;
+  fill: none;
+}
+
+.node text {
+  fill: white;
+  font-size: 2px;
 }
 
 @media all and (max-height: 568px) {
