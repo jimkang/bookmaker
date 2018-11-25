@@ -43,8 +43,8 @@ button {
 }
 
 .n-by-n-edge {
-  stroke: hsl(180, 40%, 75%);
-  stroke-width: 0.1;
+  stroke: hsl(220, 40%, 50%);
+  stroke-width: 0.01;
 }
 
 @media all and (max-height: 568px) {
