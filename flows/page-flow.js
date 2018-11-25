@@ -4,6 +4,7 @@ var range = require('d3-array').range;
 var renderJoints = require('../dom/render-joints');
 var renderEdges = require('../dom/render-edges');
 var math = require('basic-2d-math');
+var jsgraphs = require('js-graph-algorithms');
 
 function PageFlow({ seed }) {
   var random = seedrandom(seed);
@@ -32,17 +33,23 @@ function PageFlow({ seed }) {
 
   function jointStep() {
     page.joints = range(100).map(getRandomPoint);
-    console.log('page.joints', page.joints);
+    //console.log('page.joints', page.joints);
     renderJoints(page.joints);
   }
 
   function boneStep() {
     var graph = getNByNGraph({ points: page.joints });
-    console.log(graph);
+    //console.log(graph);
     renderEdges({
       edges: graph,
       className: 'n-by-n-edge',
       rootSelector: '#n-by-n-graph'
+    });
+    page.bones = getMST({ graph, points: page.joints });
+    renderEdges({
+      edges: page.bones,
+      className: 'bone',
+      rootSelector: '#bones'
     });
   }
 
@@ -67,10 +74,34 @@ function getNByNGraph({ points }) {
           y1: point[1],
           x2: points[j][0],
           y2: points[j][1],
-          dist: math.getVectorMagnitude(point, points[j])
+          dist: math.getVectorMagnitude(math.subtractPairs(point, points[j]))
         });
       }
     }
+  }
+}
+
+function getMST({ graph, points }) {
+  var g = new jsgraphs.WeightedGraph(points.length);
+  graph.forEach(addEdgeToJSGraph);
+  var finder = new jsgraphs.EagerPrimMST(g);
+  return finder.mst.map(createEdgeObject);
+
+  function addEdgeToJSGraph(edge) {
+    g.addEdge(new jsgraphs.Edge(edge.start, edge.dest, edge.dist));
+  }
+
+  function createEdgeObject(jsGraphEdge) {
+    var start = jsGraphEdge.from();
+    var dest = jsGraphEdge.to();
+    return {
+      start,
+      dest,
+      x1: points[start][0],
+      y1: points[start][1],
+      x2: points[dest][0],
+      y2: points[dest][1]
+    };
   }
 }
 
