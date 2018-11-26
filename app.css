@@ -64,6 +64,10 @@ button {
   font-size: 2px;
 }
 
+.limb-edge {
+  stroke-width: 1;
+}
+
 @media all and (max-height: 568px) {
   body {
     font-size: 18px;

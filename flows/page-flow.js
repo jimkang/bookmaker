@@ -6,6 +6,9 @@ var renderEdges = require('../dom/render-edges');
 var math = require('basic-2d-math');
 var jsgraphs = require('js-graph-algorithms');
 var Enmeaten = require('enmeaten');
+var pluck = require('lodash.pluck');
+var flatten = require('lodash.flatten');
+var accessor = require('accessor')();
 
 function PageFlow({ seed }) {
   var random = seedrandom(seed);
@@ -102,7 +105,69 @@ function PageFlow({ seed }) {
     return page.joints[index].join('_');
   }
 
-  function limbStep() {}
+  function limbStep() {
+    var junctionNodes = Object.values(page.nodes).filter(nodeIsAJunction);
+    page.limbs = {};
+    junctionNodes.forEach(followLinksToFillLimbs);
+    console.log('page.limbs', page.limbs);
+
+    renderEdges({
+      edges: flatten(Object.values(page.limbs).map(getLimbEdges)),
+      className: 'limb-edge',
+      rootSelector: '#limbs',
+      colorAccessor: accessor('color')
+    });
+
+    function followLinksToFillLimbs(junctionNode) {
+      // You can't use curry to init followLinkToFillLimb here for us in map.
+      // . e.g.
+      // var limbs = junctionNode.links
+      //  .map(curry(followLinkToFillLimb)([ junctionNode ]))
+      // It will use the same array ([ junctionNode ]) for every call to
+      // followLinkToFillLimb, making it append to arrays that start with
+      // a lot of elements in 2nd, 3rd, etc. calls!
+      var limbs = [];
+      for (var i = 0; i < junctionNode.links.length; ++i) {
+        limbs.push(
+          wrapInLimbObject(
+            followLinkToFillLimb([junctionNode], junctionNode.links[i])
+          )
+        );
+      }
+      limbs.forEach(addToPageLimbs);
+
+      function followLinkToFillLimb(limbNodes, destNodeId) {
+        var destNode = page.nodes[destNodeId];
+        limbNodes.push(destNode);
+
+        if (destNode.links.length === 2) {
+          let nodeWeCameFromId = limbNodes[limbNodes.length - 1].id;
+          if (limbNodes.length > 1) {
+            nodeWeCameFromId = limbNodes[limbNodes.length - 2].id;
+          }
+          let otherNodeId = otherNodeIdFromLink(destNode, nodeWeCameFromId);
+          if (pluck(limbNodes, 'id').indexOf(otherNodeId) === -1) {
+            return followLinkToFillLimb(limbNodes, otherNodeId);
+          }
+        }
+        return limbNodes;
+      }
+    }
+  }
+
+  function wrapInLimbObject(limbNodes) {
+    return {
+      id: [limbNodes[0].id, limbNodes[limbNodes.length - 1].id]
+        .sort()
+        .join('__'),
+      nodes: limbNodes,
+      color: `hsl(${probable.roll(360)}, 70%, 30%)`
+    };
+  }
+
+  function addToPageLimbs(limb) {
+    page.limbs[limb.id] = limb;
+  }
 
   function enmeatenStep() {
     var enmeaten = Enmeaten({ random });
@@ -160,6 +225,35 @@ function getMST({ graph, points }) {
 
 function getLinkCount(node) {
   return node.links.length;
+}
+
+function nodeIsAJunction(node) {
+  return node.links.length > 2;
+}
+
+function otherNodeIdFromLink(node, unwantedNodeId) {
+  if (node.links.length !== 2) {
+    throw new Error(
+      `otherNodeIdFromLink passed node with ${
+        node.links.length
+      } links; only works if there are two.`
+    );
+  }
+  return node.links[0] === unwantedNodeId ? node.links[1] : node.links[0];
+}
+
+function getLimbEdges(limb) {
+  var edges = [];
+  for (var i = 0; i < limb.nodes.length - 1; ++i) {
+    edges.push({
+      x1: limb.nodes[i][0],
+      y1: limb.nodes[i][1],
+      x2: limb.nodes[i + 1][0],
+      y2: limb.nodes[i + 1][1],
+      color: limb.color
+    });
+  }
+  return edges;
 }
 
 module.exports = PageFlow;
