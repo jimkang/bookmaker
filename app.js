@@ -13,14 +13,19 @@ var routeState = RouteState({
   routeState.routeFromHash();
 })();
 
-function followRoute({ stepMode, seed }) {
+function followRoute({ stepMode, seed, curve, widthToLength, forkLengthMin }) {
   if (!seed) {
     seed = new Date().toISOString();
     routeState.addToRoute({ seed });
     return;
   }
 
-  var pageFlow = PageFlow({ seed });
+  var pageFlow = PageFlow({
+    seed,
+    curve,
+    widthToLength: numberizeIfThere(widthToLength),
+    forkLengthMin: numberizeIfThere(forkLengthMin)
+  });
   wireControls({ pageFlow, clearSeed });
   pageFlow({ stepMode });
 }
@@ -31,4 +36,8 @@ function clearSeed() {
 
 function reportTopLevelError(msg, url, lineNo, columnNo, error) {
   handleError(error);
+}
+
+function numberizeIfThere(v) {
+  return isNaN(v) ? undefined : +v;
 }

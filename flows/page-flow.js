@@ -8,14 +8,29 @@ var jsgraphs = require('js-graph-algorithms');
 var Enmeaten = require('enmeaten');
 var pluck = require('lodash.pluck');
 var flatten = require('lodash.flatten');
+var shape = require('d3-shape');
+var renderPaths = require('../dom/render-paths');
+
 var accessor = require('accessor')();
 
-function PageFlow({ seed }) {
+function PageFlow({
+  seed,
+  curve = 'curveBasis',
+  widthToLength = 0.5,
+  forkLengthMin = 0.2
+}) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
   var stepIndex = 0;
 
-  var steps = [jointStep, boneStep, nodeStep, limbStep, enmeatenStep];
+  var steps = [
+    jointStep,
+    boneStep,
+    nodeStep,
+    limbStep,
+    enmeatenStep,
+    meatPathStep
+  ];
 
   var page = {};
 
@@ -161,7 +176,7 @@ function PageFlow({ seed }) {
         .sort()
         .join('__'),
       nodes: limbNodes,
-      color: `hsl(${probable.roll(360)}, 70%, 30%)`
+      color: `hsl(${probable.roll(360)}, 70%, 50%)`
     };
   }
 
@@ -170,9 +185,51 @@ function PageFlow({ seed }) {
   }
 
   function enmeatenStep() {
-    var enmeaten = Enmeaten({ random });
-    //var meatPoints = enmeaten({
-    //});
+    var enmeaten = Enmeaten({ random, numberOfDecimalsToConsider: 3 });
+    page.cuts = Object.values(page.limbs).map(makeCut);
+    renderPoints({
+      points: flatten(pluck(page.cuts, 'points')),
+      rootSelector: '#cut-points',
+      className: 'cut-point',
+      r: 0.1
+    });
+
+    // These are cuts as in "cuts of meat".
+    function makeCut(limb) {
+      const maxBoneLength = getMaxBoneLengthInNodes(limb.nodes);
+      var forkLengthMax = maxBoneLength * widthToLength;
+      if (forkLengthMax < forkLengthMin) {
+        forkLengthMax = forkLengthMin;
+      }
+      var points = enmeaten({
+        bone: limb.nodes.map(getPointFromNode),
+        forkLengthRange: [forkLengthMin, forkLengthMax],
+        wideEnds: true,
+        extraRoundness: true,
+        widthInterpolator: clampWidth
+      });
+
+      return {
+        id: 'cut__' + limb.id,
+        limbColor: limb.color,
+        points
+      };
+    }
+  }
+
+  function meatPathStep() {
+    var reticulate = shape.line().curve(shape[curve]);
+    page.cuts.forEach(addPathToCut);
+    renderPaths({
+      pathContainers: page.cuts,
+      rootSelector: '#cut-paths',
+      className: 'cut-path',
+      colorAccessor: accessor('limbColor')
+    });
+
+    function addPathToCut(cut) {
+      cut.path = reticulate(cut.points);
+    }
   }
 }
 
@@ -254,6 +311,29 @@ function getLimbEdges(limb) {
     });
   }
   return edges;
+}
+
+function getPointFromNode(node) {
+  return [node[0], node[1]];
+}
+
+function getMaxBoneLengthInNodes(nodes) {
+  var maxLength = 0;
+  for (var i = 0; i < nodes.length - 1; ++i) {
+    let length = math.getVectorMagnitude(
+      math.subtractPairs(nodes[i + 1], nodes[i])
+    );
+    if (length > maxLength) {
+      maxLength = length;
+    }
+  }
+  return maxLength;
+}
+
+// If width is really close to endToEndDistance, it will cut it down a lot.
+// If it's really far, then it won't affect it much.
+function clampWidth({ width, endToEndDistance }) {
+  return Math.max(width * (1.0 - width / endToEndDistance), 0);
 }
 
 module.exports = PageFlow;

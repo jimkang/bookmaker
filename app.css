@@ -68,6 +68,16 @@ button {
   stroke-width: 1;
 }
 
+.cut-point {
+  fill: red;
+}
+
+.cut-path {
+  fill: none;
+  stroke-width: 0.5;
+  stroke-dasharray: 2 1;
+}
+
 @media all and (max-height: 568px) {
   body {
     font-size: 18px;

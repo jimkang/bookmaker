@@ -6,6 +6,7 @@ function renderPoints({
   rootSelector,
   xProperty = '0',
   yProperty = '1',
+  r = 1,
   labelAccessor
 }) {
   const pointSelector = '.' + className;
@@ -21,7 +22,7 @@ function renderPoints({
 
   pointStems
     .append('circle')
-    .attr('r', 1)
+    .attr('r', r)
     .attr('cx', 0)
     .attr('cy', 0);
 
