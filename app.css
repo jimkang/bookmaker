@@ -78,6 +78,9 @@ button {
   stroke-dasharray: 2 1;
 }
 
+.tunnel-fill {
+}
+
 @media all and (max-height: 568px) {
   body {
     font-size: 18px;

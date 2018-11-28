@@ -10,6 +10,15 @@
 <div id="status-message" class="hidden"></div>
 
 <svg id="page" width="960" height="960" viewBox="0 0 100 100">
+ <defs>
+      <radialGradient id="GradientReflect"
+            cx="0.5" cy="0.5" r="0.4" fx="0.55" fy="0.55"
+            spreadMethod="reflect">
+        <stop offset="0%" stop-color="hsl(30, 33%, 11%)"/>
+        <stop offset="100%" stop-color="hsl(20, 30%, 8%)"/>
+      </radialGradient>
+  </defs>
+
   <g id="n-by-n-graph"></g>
   <g id="limbs"></g>
   <g id="bones"></g>
@@ -19,6 +28,7 @@
     <g id="cut-points"></g>
     <g id="cut-paths"></g>
   </g>
+  <g id="tunnel-fills"></g>
 </svg>
 
 <button id="step-button">Step</button>

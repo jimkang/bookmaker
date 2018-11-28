@@ -16,8 +16,9 @@ var accessor = require('accessor')();
 function PageFlow({
   seed,
   curve = 'curveBasis',
-  widthToLength = 0.5,
-  forkLengthMin = 0.2
+  widthToLength = 1.5,
+  forkLengthMin = 0.2,
+  showDevLayers
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
@@ -53,27 +54,35 @@ function PageFlow({
   function jointStep() {
     page.joints = range(100).map(getRandomPoint);
     //console.log('page.joints', page.joints);
-    renderPoints({
-      points: page.joints,
-      className: 'joint',
-      rootSelector: '#joints'
-    });
+    if (showDevLayers) {
+      renderPoints({
+        points: page.joints,
+        className: 'joint',
+        rootSelector: '#joints'
+      });
+    }
   }
 
   function boneStep() {
     var graph = getNByNGraph({ points: page.joints });
     //console.log(graph);
-    renderEdges({
-      edges: graph,
-      className: 'n-by-n-edge',
-      rootSelector: '#n-by-n-graph'
-    });
+    if (showDevLayers) {
+      renderEdges({
+        edges: graph,
+        className: 'n-by-n-edge',
+        rootSelector: '#n-by-n-graph'
+      });
+    }
+
     page.bones = getMST({ graph, points: page.joints });
-    renderEdges({
-      edges: page.bones,
-      className: 'bone',
-      rootSelector: '#bones'
-    });
+
+    if (showDevLayers) {
+      renderEdges({
+        edges: page.bones,
+        className: 'bone',
+        rootSelector: '#bones'
+      });
+    }
   }
 
   function getRandomPoint() {
@@ -83,12 +92,15 @@ function PageFlow({
   function nodeStep() {
     page.nodes = {};
     page.bones.forEach(updateNodesConnectedToBone);
-    renderPoints({
-      points: Object.values(page.nodes),
-      className: 'node',
-      rootSelector: '#nodes',
-      labelAccessor: getLinkCount
-    });
+
+    if (showDevLayers) {
+      renderPoints({
+        points: Object.values(page.nodes),
+        className: 'node',
+        rootSelector: '#nodes',
+        labelAccessor: getLinkCount
+      });
+    }
 
     function updateNodesConnectedToBone(bone) {
       updateNode(bone.start, bone.dest);
@@ -124,14 +136,15 @@ function PageFlow({
     var junctionNodes = Object.values(page.nodes).filter(nodeIsAJunction);
     page.limbs = {};
     junctionNodes.forEach(followLinksToFillLimbs);
-    console.log('page.limbs', page.limbs);
 
-    renderEdges({
-      edges: flatten(Object.values(page.limbs).map(getLimbEdges)),
-      className: 'limb-edge',
-      rootSelector: '#limbs',
-      colorAccessor: accessor('color')
-    });
+    if (showDevLayers) {
+      renderEdges({
+        edges: flatten(Object.values(page.limbs).map(getLimbEdges)),
+        className: 'limb-edge',
+        rootSelector: '#limbs',
+        colorAccessor: accessor('color')
+      });
+    }
 
     function followLinksToFillLimbs(junctionNode) {
       // You can't use curry to init followLinkToFillLimb here for us in map.
@@ -187,12 +200,15 @@ function PageFlow({
   function enmeatenStep() {
     var enmeaten = Enmeaten({ random, numberOfDecimalsToConsider: 3 });
     page.cuts = Object.values(page.limbs).map(makeCut);
-    renderPoints({
-      points: flatten(pluck(page.cuts, 'points')),
-      rootSelector: '#cut-points',
-      className: 'cut-point',
-      r: 0.1
-    });
+
+    if (showDevLayers) {
+      renderPoints({
+        points: flatten(pluck(page.cuts, 'points')),
+        rootSelector: '#cut-points',
+        className: 'cut-point',
+        r: 0.1
+      });
+    }
 
     // These are cuts as in "cuts of meat".
     function makeCut(limb) {
@@ -204,9 +220,10 @@ function PageFlow({
       var points = enmeaten({
         bone: limb.nodes.map(getPointFromNode),
         forkLengthRange: [forkLengthMin, forkLengthMax],
-        wideEnds: true,
-        extraRoundness: true,
-        widthInterpolator: clampWidth
+        //extraRoundness: true,
+        widthInterpolator: clampWidth,
+        symmetricalEnds: true,
+        endAngleRange: [45, 60]
       });
 
       return {
@@ -220,11 +237,21 @@ function PageFlow({
   function meatPathStep() {
     var reticulate = shape.line().curve(shape[curve]);
     page.cuts.forEach(addPathToCut);
+
+    if (showDevLayers) {
+      renderPaths({
+        pathContainers: page.cuts,
+        rootSelector: '#cut-paths',
+        className: 'cut-path',
+        colorAccessor: accessor('limbColor')
+      });
+    }
+
     renderPaths({
       pathContainers: page.cuts,
-      rootSelector: '#cut-paths',
-      className: 'cut-path',
-      colorAccessor: accessor('limbColor')
+      rootSelector: '#tunnel-fills',
+      className: 'tunnel-fill',
+      fillAccessor: 'hsl(20, 40%, 20%)' // 'url(#GradientReflect)'
     });
 
     function addPathToCut(cut) {
@@ -333,7 +360,7 @@ function getMaxBoneLengthInNodes(nodes) {
 // If width is really close to endToEndDistance, it will cut it down a lot.
 // If it's really far, then it won't affect it much.
 function clampWidth({ width, endToEndDistance }) {
-  return Math.max(width * (1.0 - width / endToEndDistance), 0);
+  return Math.max(width * (1.0 - width / endToEndDistance) * 0.6, 0);
 }
 
 module.exports = PageFlow;

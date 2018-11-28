@@ -6,7 +6,8 @@ function renderPaths({
   className,
   rootSelector,
   pathAccessor = accessor('path'),
-  colorAccessor
+  colorAccessor,
+  fillAccessor
 }) {
   var pathsRoot = d3.select(rootSelector);
   pathsRoot.selectAll('.' + className).remove();
@@ -19,6 +20,9 @@ function renderPaths({
     .attr('d', pathAccessor);
   if (colorAccessor) {
     pathLines.attr('stroke', colorAccessor);
+  }
+  if (fillAccessor) {
+    pathLines.attr('fill', fillAccessor);
   }
 }
 

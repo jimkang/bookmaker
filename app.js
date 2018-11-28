@@ -13,7 +13,14 @@ var routeState = RouteState({
   routeState.routeFromHash();
 })();
 
-function followRoute({ stepMode, seed, curve, widthToLength, forkLengthMin }) {
+function followRoute({
+  stepMode,
+  seed,
+  curve,
+  widthToLength,
+  forkLengthMin,
+  showDevLayers
+}) {
   if (!seed) {
     seed = new Date().toISOString();
     routeState.addToRoute({ seed });
@@ -24,7 +31,8 @@ function followRoute({ stepMode, seed, curve, widthToLength, forkLengthMin }) {
     seed,
     curve,
     widthToLength: numberizeIfThere(widthToLength),
-    forkLengthMin: numberizeIfThere(forkLengthMin)
+    forkLengthMin: numberizeIfThere(forkLengthMin),
+    showDevLayers
   });
   wireControls({ pageFlow, clearSeed });
   pageFlow({ stepMode });
