@@ -81,6 +81,17 @@ button {
 .tunnel-fill {
 }
 
+.curve-dest {
+  fill: hsl(150, 70%, 50%);
+  stroke: none;
+}
+
+.curve-control {
+  fill: white;
+  stroke: none;
+}
+
+
 @media all and (max-height: 568px) {
   body {
     font-size: 18px;

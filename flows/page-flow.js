@@ -10,12 +10,16 @@ var pluck = require('lodash.pluck');
 var flatten = require('lodash.flatten');
 var shape = require('d3-shape');
 var renderPaths = require('../dom/render-paths');
+var curvesFromExtremes = require('../dom/curves-from-extremes');
+var zoom = require('d3-zoom');
+var curveToPathString = require('../dom/curve-to-path-string');
+var renderBezierCurvePoints = require('../dom/render-bezier-curve-points');
 
 var accessor = require('accessor')();
 
 function PageFlow({
   seed,
-  curve = 'curveBasis',
+  curve,
   widthToLength = 1.5,
   forkLengthMin = 0.2,
   showDevLayers
@@ -235,7 +239,12 @@ function PageFlow({
   }
 
   function meatPathStep() {
-    var reticulate = shape.line().curve(shape[curve]);
+    var d3Reticulator;
+    if (curve) {
+      d3Reticulator = shape.line().curve(shape[curve]);
+    }
+    page.diagnosticBezierCurves = [];
+
     page.cuts.forEach(addPathToCut);
 
     if (showDevLayers) {
@@ -254,8 +263,25 @@ function PageFlow({
       fillAccessor: 'hsl(20, 40%, 20%)' // 'url(#GradientReflect)'
     });
 
+    if (showDevLayers) {
+      renderBezierCurvePoints({
+        rootSelector: '#bezier-points',
+        curves: flatten(pluck(page.diagnosticBezierCurves, 'curves'))
+      });
+    }
+
     function addPathToCut(cut) {
-      cut.path = reticulate(cut.points);
+      if (d3Reticulator) {
+        cut.path = d3Reticulator(cut.points);
+      } else {
+        let bezierCurves = curvesFromExtremes(zoom.zoomIdentity, cut.points);
+        console.log('bezierCurves', bezierCurves);
+        cut.path = `M ${bezierCurves.start.x},${bezierCurves.start.y}`;
+        cut.path += bezierCurves.curves.map(curveToPathString).join('\n');
+        page.diagnosticBezierCurves = page.diagnosticBezierCurves.concat(
+          bezierCurves
+        );
+      }
     }
   }
 }
