@@ -34,12 +34,17 @@ function PageFlow({
   randomizeJointSize,
   randomizeNodeLabels,
   randomizeReticulation,
+  randomizeJointCount,
   figure = '🐙',
   friendFigure = '🦖'
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
   var stepIndex = 0;
+
+  if (randomizeJointCount === 'yes') {
+    jointCount = 10 + probable.roll(140);
+  }
 
   var steps = [
     jointStep,

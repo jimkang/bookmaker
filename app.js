@@ -31,7 +31,8 @@ function followRoute({
   randomizeReticulation,
   hideUI,
   figure,
-  friendFigure
+  friendFigure,
+  randomizeJointCount
 }) {
   if (!seed) {
     seed = new Date().toISOString();
@@ -55,7 +56,8 @@ function followRoute({
     randomizeNodeLabels,
     randomizeReticulation,
     figure,
-    friendFigure
+    friendFigure,
+    randomizeJointCount
   });
   wireControls({ pageFlow, clearSeed, hideUI: hideUI === 'yes' });
   pageFlow({ stepMode });
