@@ -263,11 +263,12 @@ function PageFlow({
     }
 
     if (!hideProdLayers) {
+      let tunnelColor = getTunnelColor();
       renderPaths({
         pathContainers: page.cuts,
         rootSelector: '#tunnel-fills',
         className: 'tunnel-fill',
-        fillAccessor: `hsla(${probable.roll(360)}, 80%, 70%, 0.2)`
+        fillAccessor: tunnelColor
       });
     }
 
@@ -290,6 +291,14 @@ function PageFlow({
           bezierCurves
         );
       }
+    }
+  }
+
+  function getTunnelColor() {
+    if (probable.roll(4) === 0) {
+      return 'hsla(0, 0%, 0%, 0.8)';
+    } else {
+      return `hsla(${probable.roll(360)}, 80%, 50%, 0.2)`;
     }
   }
 }
