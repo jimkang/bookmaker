@@ -267,7 +267,7 @@ function PageFlow({
         pathContainers: page.cuts,
         rootSelector: '#tunnel-fills',
         className: 'tunnel-fill',
-        fillAccessor: 'hsl(20, 40%, 20%)' // 'url(#GradientReflect)'
+        fillAccessor: `hsla(${probable.roll(360)}, 80%, 70%, 0.2)`
       });
     }
 
