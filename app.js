@@ -28,7 +28,10 @@ function followRoute({
   randomizeCutPointColor,
   randomizeJointSize,
   randomizeNodeLabels,
-  randomizeReticulation
+  randomizeReticulation,
+  hideUI,
+  figure,
+  friendFigure
 }) {
   if (!seed) {
     seed = new Date().toISOString();
@@ -50,9 +53,11 @@ function followRoute({
     randomizeCutPointColor,
     randomizeJointSize,
     randomizeNodeLabels,
-    randomizeReticulation
+    randomizeReticulation,
+    figure,
+    friendFigure
   });
-  wireControls({ pageFlow, clearSeed });
+  wireControls({ pageFlow, clearSeed, hideUI: hideUI === 'yes' });
   pageFlow({ stepMode });
 }
 

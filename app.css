@@ -1,5 +1,5 @@
 body {
-  font-size: 24pt;
+  font-size: 24px;
   font-family: futura, sans-serif;
   background-color: black;
   color: #444;
@@ -90,6 +90,11 @@ button {
 
 .curve-dest-ctrl {
   stroke: none;
+}
+
+.figure {
+  font-size: 4px;
+  opacity: 0.95;
 }
 
 @media all and (max-height: 568px) {

@@ -14,6 +14,7 @@ var curvesFromExtremes = require('../dom/curves-from-extremes');
 var zoom = require('d3-zoom');
 var curveToPathString = require('../dom/curve-to-path-string');
 var renderBezierCurvePoints = require('../dom/render-bezier-curve-points');
+var renderGuy = require('../dom/render-guy');
 
 var accessor = require('accessor')();
 const layerShowChance = 40;
@@ -32,7 +33,9 @@ function PageFlow({
   randomizeCutPointColor,
   randomizeJointSize,
   randomizeNodeLabels,
-  randomizeReticulation
+  randomizeReticulation,
+  figure = '🐙',
+  friendFigure = '🦖'
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
@@ -44,7 +47,8 @@ function PageFlow({
     nodeStep,
     limbStep,
     enmeatenStep,
-    meatPathStep
+    meatPathStep,
+    guyStep
   ];
 
   var page = {};
@@ -356,6 +360,33 @@ function PageFlow({
     }
   }
 
+  function guyStep() {
+    var homeBone = probable.pickFromArray(page.bones);
+    var guyLocation = getLocationOnBone(homeBone);
+    renderGuy({
+      x: guyLocation[0],
+      y: guyLocation[1],
+      rotation: probable.roll(360),
+      figure,
+      rootSelector: '#searcher'
+    });
+
+    var friendBone;
+    if (page.bones.length > 1) {
+      do {
+        friendBone = probable.pickFromArray(page.bones);
+      } while (friendBone.id !== homeBone.id);
+      var friendLocation = getLocationOnBone(friendBone);
+      renderGuy({
+        x: friendLocation[0],
+        y: friendLocation[1],
+        rotation: probable.roll(360),
+        figure: friendFigure,
+        rootSelector: '#lost-friend'
+      });
+    }
+  }
+
   function getTunnelColor() {
     if (probable.roll(4) === 0) {
       return 'hsla(0, 0%, 0%, 0.8)';
@@ -405,6 +436,13 @@ function PageFlow({
     } else {
       return probable.roll(10);
     }
+  }
+
+  function getLocationOnBone(bone) {
+    var boneXRange = bone.x2 - bone.y2;
+    var boneSlope = (bone.y2 - bone.y1) / boneXRange;
+    var xDelta = probable.roll(boneXRange * 1000) / 1000;
+    return [bone.y2 + xDelta, bone.y1 + xDelta * boneSlope];
   }
 }
 
