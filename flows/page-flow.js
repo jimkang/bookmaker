@@ -378,7 +378,7 @@ function PageFlow({
     var homeBone = probable.pickFromArray(page.bones);
     var guyLocation = getLocationOnBone(homeBone);
     if (lastPage) {
-      guyLocation = [10, 50];
+      guyLocation = [40, 60];
     } else if (firstPage) {
       guyLocation = [50, 50];
     }
@@ -395,7 +395,7 @@ function PageFlow({
     if (!firstPage && page.bones.length > 1) {
       let friendLocation;
       if (lastPage) {
-        friendLocation = [60, 50];
+        friendLocation = [60, 60];
       } else {
         do {
           friendBone = probable.pickFromArray(page.bones);

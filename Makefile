@@ -21,3 +21,6 @@ sync:
 	rsync -a $(HOMEDIR)/ $(USER)@$(SERVER):/$(APPDIR) --exclude node_modules/ \
 		--omit-dir-times --no-perms
 
+build-pdf:
+	convert "~/Downloads/book/*.{png,jpg}" -background black -quality 100 pdf/where-in-space-are-you.pdf
+
