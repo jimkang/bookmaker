@@ -21,7 +21,10 @@ function followRoute({
   forkLengthMin,
   showDevLayers,
   hideProdLayers,
-  jointCount
+  jointCount,
+  randomizeNxNLayerColor,
+  randomizeCutPathStyle,
+  randomizeLayersToShow
 }) {
   if (!seed) {
     seed = new Date().toISOString();
@@ -36,7 +39,10 @@ function followRoute({
     forkLengthMin: numberizeIfThere(forkLengthMin),
     showDevLayers,
     hideProdLayers,
-    jointCount
+    jointCount,
+    randomizeNxNLayerColor,
+    randomizeCutPathStyle,
+    randomizeLayersToShow: randomizeLayersToShow === 'yes'
   });
   wireControls({ pageFlow, clearSeed });
   pageFlow({ stepMode });

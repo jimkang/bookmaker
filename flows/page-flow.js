@@ -16,6 +16,7 @@ var curveToPathString = require('../dom/curve-to-path-string');
 var renderBezierCurvePoints = require('../dom/render-bezier-curve-points');
 
 var accessor = require('accessor')();
+const layerShowChance = 40;
 
 function PageFlow({
   seed,
@@ -24,7 +25,10 @@ function PageFlow({
   forkLengthMin = 0.2,
   showDevLayers,
   hideProdLayers = false,
-  jointCount = 100
+  jointCount = 100,
+  randomizeNxNLayerColor,
+  randomizeCutPathStyle,
+  randomizeLayersToShow = false
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
@@ -61,11 +65,13 @@ function PageFlow({
     page.joints = range(jointCount).map(getRandomPoint);
     //console.log('page.joints', page.joints);
     if (showDevLayers) {
-      renderPoints({
-        points: page.joints,
-        className: 'joint',
-        rootSelector: '#joints'
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderPoints({
+          points: page.joints,
+          className: 'joint',
+          rootSelector: '#joints'
+        });
+      }
     }
   }
 
@@ -73,21 +79,35 @@ function PageFlow({
     var graph = getNByNGraph({ points: page.joints });
     //console.log(graph);
     if (showDevLayers) {
-      renderEdges({
-        edges: graph,
-        className: 'n-by-n-edge',
-        rootSelector: '#n-by-n-graph'
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        let colorAccessor;
+        if (randomizeNxNLayerColor === 'yes') {
+          if (probable.roll(4) === 0) {
+            colorAccessor = getNxNColor;
+          } else {
+            colorAccessor = getNxNColor();
+          }
+        }
+
+        renderEdges({
+          edges: graph,
+          className: 'n-by-n-edge',
+          rootSelector: '#n-by-n-graph',
+          colorAccessor
+        });
+      }
     }
 
     page.bones = getMST({ graph, points: page.joints });
 
     if (showDevLayers) {
-      renderEdges({
-        edges: page.bones,
-        className: 'bone',
-        rootSelector: '#bones'
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderEdges({
+          edges: page.bones,
+          className: 'bone',
+          rootSelector: '#bones'
+        });
+      }
     }
   }
 
@@ -100,12 +120,14 @@ function PageFlow({
     page.bones.forEach(updateNodesConnectedToBone);
 
     if (showDevLayers) {
-      renderPoints({
-        points: Object.values(page.nodes),
-        className: 'node',
-        rootSelector: '#nodes',
-        labelAccessor: getLinkCount
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderPoints({
+          points: Object.values(page.nodes),
+          className: 'node',
+          rootSelector: '#nodes',
+          labelAccessor: getLinkCount
+        });
+      }
     }
 
     function updateNodesConnectedToBone(bone) {
@@ -148,12 +170,14 @@ function PageFlow({
     junctionNodes.forEach(followLinksToFillLimbs);
 
     if (showDevLayers) {
-      renderEdges({
-        edges: flatten(Object.values(page.limbs).map(getLimbEdges)),
-        className: 'limb-edge',
-        rootSelector: '#limbs',
-        colorAccessor: accessor('color')
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderEdges({
+          edges: flatten(Object.values(page.limbs).map(getLimbEdges)),
+          className: 'limb-edge',
+          rootSelector: '#limbs',
+          colorAccessor: accessor('color')
+        });
+      }
     }
 
     function followLinksToFillLimbs(junctionNode) {
@@ -212,12 +236,14 @@ function PageFlow({
     page.cuts = Object.values(page.limbs).map(makeCut);
 
     if (showDevLayers) {
-      renderPoints({
-        points: flatten(pluck(page.cuts, 'points')),
-        rootSelector: '#cut-points',
-        className: 'cut-point',
-        r: 0.7
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderPoints({
+          points: flatten(pluck(page.cuts, 'points')),
+          rootSelector: '#cut-points',
+          className: 'cut-point',
+          r: 0.7
+        });
+      }
     }
 
     // These are cuts as in "cuts of meat".
@@ -254,29 +280,45 @@ function PageFlow({
     page.cuts.forEach(addPathToCut);
 
     if (showDevLayers) {
-      renderPaths({
-        pathContainers: page.cuts,
-        rootSelector: '#cut-paths',
-        className: 'cut-path',
-        colorAccessor: accessor('limbColor')
-      });
+      let strokeWidthAccessor;
+      let strokeDashArrayAccessor;
+
+      if (randomizeCutPathStyle) {
+        strokeWidthAccessor = getCutPathStrokeWidth;
+        strokeDashArrayAccessor = getCutPathDashArray;
+      }
+
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderPaths({
+          pathContainers: page.cuts,
+          rootSelector: '#cut-paths',
+          className: 'cut-path',
+          colorAccessor: accessor('limbColor'),
+          strokeWidthAccessor,
+          strokeDashArrayAccessor
+        });
+      }
     }
 
     if (!hideProdLayers) {
       let tunnelColor = getTunnelColor();
-      renderPaths({
-        pathContainers: page.cuts,
-        rootSelector: '#tunnel-fills',
-        className: 'tunnel-fill',
-        fillAccessor: tunnelColor
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderPaths({
+          pathContainers: page.cuts,
+          rootSelector: '#tunnel-fills',
+          className: 'tunnel-fill',
+          fillAccessor: tunnelColor
+        });
+      }
     }
 
     if (showDevLayers) {
-      renderBezierCurvePoints({
-        rootSelector: '#bezier-points',
-        curves: flatten(pluck(page.diagnosticBezierCurves, 'curves'))
-      });
+      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+        renderBezierCurvePoints({
+          rootSelector: '#bezier-points',
+          curves: flatten(pluck(page.diagnosticBezierCurves, 'curves'))
+        });
+      }
     }
 
     function addPathToCut(cut) {
@@ -298,8 +340,25 @@ function PageFlow({
     if (probable.roll(4) === 0) {
       return 'hsla(0, 0%, 0%, 0.8)';
     } else {
-      return `hsla(${probable.roll(360)}, 80%, 50%, 0.2)`;
+      // Avoid yellows.
+      return `hsla(${(180 + probable.roll(200)) % 360}, 80%, 50%, 0.2)`;
     }
+  }
+
+  function getNxNColor() {
+    if (probable.roll(4) === 0) {
+      return 'hsl(220, 40%, 50%)';
+    } else {
+      return `hsl(${probable.roll(360)}, 40%, 50%)`;
+    }
+  }
+
+  function getCutPathStrokeWidth() {
+    return 0.1 * probable.rollDie(10);
+  }
+
+  function getCutPathDashArray() {
+    return `${0.1 * probable.rollDie(10)} ${0.1 * probable.rollDie(10)}`;
   }
 }
 

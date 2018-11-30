@@ -7,7 +7,9 @@ function renderPaths({
   rootSelector,
   pathAccessor = accessor('path'),
   colorAccessor,
-  fillAccessor
+  fillAccessor,
+  strokeDashArrayAccessor,
+  strokeWidthAccessor
 }) {
   var pathsRoot = d3.select(rootSelector);
   pathsRoot.selectAll('.' + className).remove();
@@ -23,6 +25,12 @@ function renderPaths({
   }
   if (fillAccessor) {
     pathLines.attr('fill', fillAccessor);
+  }
+  if (strokeDashArrayAccessor) {
+    pathLines.style('stroke-dasharray', strokeDashArrayAccessor);
+  }
+  if (strokeWidthAccessor) {
+    pathLines.style('stroke-width', strokeWidthAccessor);
   }
 }
 

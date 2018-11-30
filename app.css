@@ -44,7 +44,6 @@ button {
 }
 
 .n-by-n-edge {
-  stroke: hsl(220, 40%, 50%);
   stroke-width: 0.01;
 }
 
@@ -74,8 +73,8 @@ button {
 
 .cut-path {
   fill: none;
-  stroke-width: 0.5;
-  stroke-dasharray: 2 1;
+  /* stroke-width: 0.5; */
+  /* stroke-dasharray: 2 1; */
 }
 
 .tunnel-fill {
