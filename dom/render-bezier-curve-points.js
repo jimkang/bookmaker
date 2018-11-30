@@ -51,7 +51,7 @@ function renderBezierCurvePoints({ rootSelector, curves }) {
 }
 
 function getBezierPointColor(d, i) {
-  return `hsl(${360 * i/10}, 70%, 50%`;
+  return `hsl(${(360 * i) / 10}, 70%, 50%`;
 }
 
 module.exports = renderBezierCurvePoints;
