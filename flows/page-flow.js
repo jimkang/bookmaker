@@ -100,7 +100,10 @@ function PageFlow({
     var graph = getNByNGraph({ points: page.joints });
     //console.log(graph);
     if (showDevLayers) {
-      if (!randomizeLayersToShow || probable.roll(100) <= layerShowChance) {
+      if (
+        !randomizeLayersToShow ||
+        probable.roll(100) <= layerShowChance - 10
+      ) {
         let colorAccessor;
         if (randomizeNxNLayerColor === 'yes') {
           if (probable.roll(4) === 0) {
@@ -375,9 +378,9 @@ function PageFlow({
     var homeBone = probable.pickFromArray(page.bones);
     var guyLocation = getLocationOnBone(homeBone);
     if (lastPage) {
-      guyLocation = [10, 70];
+      guyLocation = [10, 50];
     } else if (firstPage) {
-      guyLocation = [40, 70];
+      guyLocation = [50, 50];
     }
     renderGuy({
       x: guyLocation[0],
@@ -392,7 +395,7 @@ function PageFlow({
     if (!firstPage && page.bones.length > 1) {
       let friendLocation;
       if (lastPage) {
-        friendLocation = [60, 70];
+        friendLocation = [60, 50];
       } else {
         do {
           friendBone = probable.pickFromArray(page.bones);
