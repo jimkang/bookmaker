@@ -9,36 +9,40 @@
 
 <div id="status-message" class="hidden"></div>
 
-<svg id="page" width="960" height="960" viewBox="0 0 100 100">
- <defs>
-      <radialGradient id="starGradient">
-        <stop offset="0%" stop-color="white"/>
-        <stop offset="70%" stop-color="white"/>
-        <stop offset="95%" stop-color="hsl(240, 30%, 10%)"/>
-        <stop offset="100%" stop-color="hsl(290, 30%, 0%)"/>
-      </radialGradient>
-  </defs>
+<div id="book-area">
+  <svg id="page" width="960" height="960" viewBox="0 0 100 100">
+   <defs>
+        <radialGradient id="starGradient">
+          <stop offset="0%" stop-color="white"/>
+          <stop offset="70%" stop-color="white"/>
+          <stop offset="95%" stop-color="hsl(240, 30%, 10%)"/>
+          <stop offset="100%" stop-color="hsl(290, 30%, 0%)"/>
+        </radialGradient>
+    </defs>
 
-  <g id="n-by-n-graph"></g>
-  <g id="limbs"></g>
-  <g id="bones"></g>
-  <g id="joints"></g>
-  <g id="nodes"></g>
-  <g id="cuts">
-    <g id="cut-points"></g>
-    <g id="cut-paths"></g>
-  </g>
-  <g id="tunnel-fills"></g>
-  <g id="bezier-points"></g>
-  <g id="guys-layer">
-    <g id="searcher">
-      <text class="figure"></text>
+    <g id="n-by-n-graph"></g>
+    <g id="limbs"></g>
+    <g id="bones"></g>
+    <g id="joints"></g>
+    <g id="nodes"></g>
+    <g id="cuts">
+      <g id="cut-points"></g>
+      <g id="cut-paths"></g>
     </g>
-    <g id="lost-friend">
-      <text class="figure"></text>
+    <g id="tunnel-fills"></g>
+    <g id="bezier-points"></g>
+    <g id="guys-layer">
+      <g id="searcher">
+        <text class="figure"></text>
+      </g>
+      <g id="lost-friend">
+        <text class="figure"></text>
+      </g>
     </g>
-  </g>
-</svg>
+  </svg>
+
+  <div id="story-text"></div>
+</div>
 
 <button id="step-button">Step</button>
 <button id="clear-seed-button">Clear seed</button>

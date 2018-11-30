@@ -15,6 +15,7 @@ var zoom = require('d3-zoom');
 var curveToPathString = require('../dom/curve-to-path-string');
 var renderBezierCurvePoints = require('../dom/render-bezier-curve-points');
 var renderGuy = require('../dom/render-guy');
+var renderStoryText = require('../dom/render-story-text');
 
 var accessor = require('accessor')();
 const layerShowChance = 40;
@@ -36,13 +37,17 @@ function PageFlow({
   randomizeReticulation,
   randomizeJointCount,
   figure = '🐙',
-  friendFigure = '🦖'
+  friendFigure = '🦀',
+  firstPage,
+  lastPage
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
   var stepIndex = 0;
 
-  if (randomizeJointCount === 'yes') {
+  if (firstPage || lastPage) {
+    jointCount = 10;
+  } else if (randomizeJointCount === 'yes') {
     jointCount = 10 + probable.roll(140);
   }
 
@@ -53,7 +58,8 @@ function PageFlow({
     limbStep,
     enmeatenStep,
     meatPathStep,
-    guyStep
+    guyStep,
+    textStep
   ];
 
   var page = {};
@@ -368,30 +374,100 @@ function PageFlow({
   function guyStep() {
     var homeBone = probable.pickFromArray(page.bones);
     var guyLocation = getLocationOnBone(homeBone);
+    if (lastPage) {
+      guyLocation = [10, 70];
+    } else if (firstPage) {
+      guyLocation = [40, 70];
+    }
     renderGuy({
       x: guyLocation[0],
       y: guyLocation[1],
-      rotation: probable.roll(360),
+      rotation: lastPage || firstPage ? 0 : probable.roll(360),
       figure,
-      rootSelector: '#searcher'
+      rootSelector: '#searcher',
+      className: firstPage || lastPage ? 'embiggened' : ''
     });
 
     var friendBone;
-    if (page.bones.length > 1) {
-      do {
-        friendBone = probable.pickFromArray(page.bones);
-      } while (friendBone.id !== homeBone.id);
-      var friendLocation = getLocationOnBone(friendBone);
+    if (!firstPage && page.bones.length > 1) {
+      let friendLocation;
+      if (lastPage) {
+        friendLocation = [60, 70];
+      } else {
+        do {
+          friendBone = probable.pickFromArray(page.bones);
+        } while (friendBone.id !== homeBone.id);
+        friendLocation = getLocationOnBone(friendBone);
+      }
       renderGuy({
         x: friendLocation[0],
         y: friendLocation[1],
-        rotation: probable.roll(360),
+        rotation: lastPage || firstPage ? 0 : probable.roll(360),
         figure: friendFigure,
-        rootSelector: '#lost-friend'
+        rootSelector: '#lost-friend',
+        className: firstPage || lastPage ? 'embiggened' : ''
       });
     }
   }
 
+  function textStep() {
+    var text;
+    if (firstPage) {
+      text =
+        'Hello. My friend is lost. Lost in the depths of strange space! But! I will find them.';
+    } else if (lastPage) {
+      text =
+        '<p>"Aha! There you are!"</p><p>"And there you are! Space is a small world."</p><p>"Space is not a world."</p><p>"If you say so! Well, let\'s eat a dinner.</p>';
+    } else {
+      text = probable.pickFromArray([
+        'Where is my friend?',
+        `Could they be ${probable.pickFromArray(['here', 'there'])}?`,
+        'Maybe I should back up?',
+        'HELLO! ANY FRIENDS OUT HERE?',
+        `${probable.pickFromArray([
+          'Wow',
+          'Whoa',
+          'OMG'
+        ])} ${probable.pickFromArray([
+          'check that out',
+          'look at that',
+          'lookit'
+        ])}!`,
+        "Maybe they're behind that thing.",
+        'Do you see them?',
+        `I feel ${probable.pickFromArray([
+          'lost',
+          'scared',
+          'depressed',
+          'overwhelmed'
+        ])}.`,
+        'Was I already here?',
+        'What is this quadrant?',
+        'So weird!',
+        "I've gotta keep on searching!",
+        "I've gotta do my very best!",
+        'This is kinda fun.',
+        `Space is ${probable.pickFromArray([
+          'vast',
+          'amazing',
+          'beautiful',
+          'unfathomable'
+        ])}.`,
+        `There are a lot of ${probable.pickFromArray([
+          'weird',
+          'strange',
+          'mysterious'
+        ])} ${probable.pickFromArray([
+          'developments',
+          'systems',
+          'forces'
+        ])} out here.`,
+        'I wonder if my friend is hungry, too?'
+      ]);
+    }
+
+    renderStoryText({ text });
+  }
   function getTunnelColor() {
     if (probable.roll(4) === 0) {
       return 'hsla(0, 0%, 0%, 0.8)';
