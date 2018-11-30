@@ -28,7 +28,11 @@ function PageFlow({
   jointCount = 100,
   randomizeNxNLayerColor,
   randomizeCutPathStyle,
-  randomizeLayersToShow = false
+  randomizeLayersToShow = false,
+  randomizeCutPointColor,
+  randomizeJointSize,
+  randomizeNodeLabels,
+  randomizeReticulation
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
@@ -69,7 +73,9 @@ function PageFlow({
         renderPoints({
           points: page.joints,
           className: 'joint',
-          rootSelector: '#joints'
+          rootSelector: '#joints',
+          r: randomizeJointSize === 'yes' ? getJointSize : undefined,
+          colorAccessor: getStarColor
         });
       }
     }
@@ -125,7 +131,8 @@ function PageFlow({
           points: Object.values(page.nodes),
           className: 'node',
           rootSelector: '#nodes',
-          labelAccessor: getLinkCount
+          labelAccessor:
+            randomizeNodeLabels === 'yes' ? getRandomLabel : getLinkCount
         });
       }
     }
@@ -241,7 +248,9 @@ function PageFlow({
           points: flatten(pluck(page.cuts, 'points')),
           rootSelector: '#cut-points',
           className: 'cut-point',
-          r: 0.7
+          r: 0.7,
+          colorAccessor:
+            randomizeCutPointColor === 'yes' ? getCutPointColor() : undefined
         });
       }
     }
@@ -272,7 +281,18 @@ function PageFlow({
 
   function meatPathStep() {
     var d3Reticulator;
-    if (curve) {
+    if (randomizeReticulation === 'yes') {
+      if (probable.roll(2) === 0) {
+        let d3Curve = probable.pickFromArray([
+          'curveBasisClosed',
+          'curveCatmullRomClosed',
+          'curveStep'
+        ]);
+
+        d3Reticulator = shape.line().curve(shape[d3Curve]);
+      }
+      // else, just use the bezier curve stuff.
+    } else if (curve) {
       d3Reticulator = shape.line().curve(shape[curve]);
     }
     page.diagnosticBezierCurves = [];
@@ -359,6 +379,32 @@ function PageFlow({
 
   function getCutPathDashArray() {
     return `${0.1 * probable.rollDie(10)} ${0.1 * probable.rollDie(10)}`;
+  }
+
+  function getCutPointColor() {
+    return `hsl(${probable.roll(360)}, 40%, 30%)`;
+  }
+
+  function getJointSize() {
+    return (probable.rollDie(5) + probable.rollDie(6)) * 0.1;
+  }
+
+  function getStarColor() {
+    if (probable.roll(4) === 0) {
+      return 'white';
+    } else {
+      return `hsl(${probable.roll(360)}, 60%, ${40 + probable.roll(20)}%)`;
+    }
+  }
+
+  function getRandomLabel() {
+    if (probable.roll(4) === 0) {
+      return String.fromCharCode(97 + probable.roll(11500));
+    } else if (probable.roll(4) === 0) {
+      return probable.roll(100);
+    } else {
+      return probable.roll(10);
+    }
   }
 }
 

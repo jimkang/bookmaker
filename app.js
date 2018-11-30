@@ -24,7 +24,11 @@ function followRoute({
   jointCount,
   randomizeNxNLayerColor,
   randomizeCutPathStyle,
-  randomizeLayersToShow
+  randomizeLayersToShow,
+  randomizeCutPointColor,
+  randomizeJointSize,
+  randomizeNodeLabels,
+  randomizeReticulation
 }) {
   if (!seed) {
     seed = new Date().toISOString();
@@ -42,7 +46,11 @@ function followRoute({
     jointCount,
     randomizeNxNLayerColor,
     randomizeCutPathStyle,
-    randomizeLayersToShow: randomizeLayersToShow === 'yes'
+    randomizeLayersToShow: randomizeLayersToShow === 'yes',
+    randomizeCutPointColor,
+    randomizeJointSize,
+    randomizeNodeLabels,
+    randomizeReticulation
   });
   wireControls({ pageFlow, clearSeed });
   pageFlow({ stepMode });

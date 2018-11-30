@@ -40,7 +40,6 @@ button {
 }
 
 #joints circle {
-  fill: white;
 }
 
 .n-by-n-edge {
@@ -53,8 +52,9 @@ button {
 }
 
 .node circle {
-  stroke: hsl(10, 70%, 50%);
-  stroke-width: 0.2;
+  /* stroke: hsl(10, 70%, 50%); */
+  stroke: white;
+  stroke-width: 0.1;
   fill: none;
 }
 
@@ -68,7 +68,7 @@ button {
 }
 
 .cut-point {
-  fill: red;
+  /* fill: red; */
 }
 
 .cut-path {

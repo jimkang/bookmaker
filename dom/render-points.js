@@ -7,7 +7,8 @@ function renderPoints({
   xProperty = '0',
   yProperty = '1',
   r = 1,
-  labelAccessor
+  labelAccessor,
+  colorAccessor
 }) {
   const pointSelector = '.' + className;
   var pointsRoot = d3.select(rootSelector);
@@ -20,7 +21,7 @@ function renderPoints({
     .classed(className, true)
     .attr('transform', getTransform);
 
-  pointStems
+  var pointCircles = pointStems
     .append('circle')
     .attr('r', r)
     .attr('cx', 0)
@@ -32,6 +33,9 @@ function renderPoints({
       .attr('dx', -0.5)
       .attr('dy', -1)
       .text(labelAccessor);
+  }
+  if (colorAccessor) {
+    pointCircles.attr('fill', colorAccessor);
   }
 
   function getTransform(point) {
