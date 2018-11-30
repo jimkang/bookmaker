@@ -10,6 +10,7 @@ var routeState = RouteState({
 
 (function go() {
   window.onerror = reportTopLevelError;
+  window.Typekit.load();
   routeState.routeFromHash();
 })();
 
