@@ -22,7 +22,9 @@ function PageFlow({
   curve,
   widthToLength = 1.5,
   forkLengthMin = 0.2,
-  showDevLayers
+  showDevLayers,
+  hideProdLayers = false,
+  jointCount = 100
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
@@ -56,7 +58,7 @@ function PageFlow({
   }
 
   function jointStep() {
-    page.joints = range(100).map(getRandomPoint);
+    page.joints = range(jointCount).map(getRandomPoint);
     //console.log('page.joints', page.joints);
     if (showDevLayers) {
       renderPoints({
@@ -139,6 +141,10 @@ function PageFlow({
   function limbStep() {
     var junctionNodes = Object.values(page.nodes).filter(nodeIsAJunction);
     page.limbs = {};
+    if (junctionNodes.length < 1) {
+      junctionNodes.push(Object.values(page.nodes)[0]);
+    }
+
     junctionNodes.forEach(followLinksToFillLimbs);
 
     if (showDevLayers) {
@@ -210,7 +216,7 @@ function PageFlow({
         points: flatten(pluck(page.cuts, 'points')),
         rootSelector: '#cut-points',
         className: 'cut-point',
-        r: 0.1
+        r: 0.7
       });
     }
 
@@ -256,12 +262,14 @@ function PageFlow({
       });
     }
 
-    renderPaths({
-      pathContainers: page.cuts,
-      rootSelector: '#tunnel-fills',
-      className: 'tunnel-fill',
-      fillAccessor: 'hsl(20, 40%, 20%)' // 'url(#GradientReflect)'
-    });
+    if (!hideProdLayers) {
+      renderPaths({
+        pathContainers: page.cuts,
+        rootSelector: '#tunnel-fills',
+        className: 'tunnel-fill',
+        fillAccessor: 'hsl(20, 40%, 20%)' // 'url(#GradientReflect)'
+      });
+    }
 
     if (showDevLayers) {
       renderBezierCurvePoints({

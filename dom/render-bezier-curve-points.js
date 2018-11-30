@@ -8,27 +8,50 @@ function renderBezierCurvePoints({ rootSelector, curves }) {
   circles
     .enter()
     .append('circle')
-    .attr('r', 0.2)
+    .attr('r', 0.5)
     .classed('curve-dest', true)
     .merge(circles)
     .attr('cx', point => point[0])
-    .attr('cy', point => point[1]);
+    .attr('cy', point => point[1])
+    .attr('fill', getBezierPointColor);
 
-  var controlCircles = bezierCurveRoot
-    .selectAll('.curve-control')
+  var srcCtrlCircles = bezierCurveRoot
+    .selectAll('.curve-src-ctrl')
     .data(
       curves
         .map(curve => curve.srcCtrlPt)
         .concat(curves.map(curve => curve.destCtrlPt))
     );
-  controlCircles
+  srcCtrlCircles
     .enter()
     .append('circle')
-    .attr('r', 0.1)
-    .classed('curve-control', true)
-    .merge(controlCircles)
+    .attr('r', 0.3)
+    .classed('curve-src-ctrl', true)
+    .merge(srcCtrlCircles)
     .attr('cx', point => point[0])
-    .attr('cy', point => point[1]);
+    .attr('cy', point => point[1])
+    .attr('fill', getBezierPointColor);
+
+  var destCtrlCircles = bezierCurveRoot
+    .selectAll('.curve-dest-ctrl')
+    .data(
+      curves
+        .map(curve => curve.destCtrlPt)
+        .concat(curves.map(curve => curve.destCtrlPt))
+    );
+  destCtrlCircles
+    .enter()
+    .append('circle')
+    .attr('r', 0.3)
+    .classed('curve-dest-ctrl', true)
+    .merge(destCtrlCircles)
+    .attr('cx', point => point[0])
+    .attr('cy', point => point[1])
+    .attr('fill', getBezierPointColor);
+}
+
+function getBezierPointColor(d, i) {
+  return `hsl(${360 * i/10}, 70%, 50%`;
 }
 
 module.exports = renderBezierCurvePoints;

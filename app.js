@@ -19,7 +19,9 @@ function followRoute({
   curve,
   widthToLength,
   forkLengthMin,
-  showDevLayers
+  showDevLayers,
+  hideProdLayers,
+  jointCount
 }) {
   if (!seed) {
     seed = new Date().toISOString();
@@ -32,7 +34,9 @@ function followRoute({
     curve,
     widthToLength: numberizeIfThere(widthToLength),
     forkLengthMin: numberizeIfThere(forkLengthMin),
-    showDevLayers
+    showDevLayers,
+    hideProdLayers,
+    jointCount
   });
   wireControls({ pageFlow, clearSeed });
   pageFlow({ stepMode });

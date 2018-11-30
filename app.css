@@ -82,15 +82,16 @@ button {
 }
 
 .curve-dest {
-  fill: hsl(150, 70%, 50%);
   stroke: none;
 }
 
-.curve-control {
-  fill: white;
+.curve-src-ctrl {
   stroke: none;
 }
 
+.curve-dest-ctrl {
+  stroke: none;
+}
 
 @media all and (max-height: 568px) {
   body {
