@@ -3,7 +3,9 @@ body {
   font-family: brandon-grotesque, futura, sans-serif;
   background-color: black;
   color: #444;
-  height: 100%;
+  width: 850;
+  height: 1100;
+  margin: 0;
 }
 
 .hidden {
@@ -111,8 +113,8 @@ button {
 }
 
 #book-area {
-  margin: 1em;
-  height: 1024px;
+  margin: 0;
+  height: 100%;
 }
 
 @media all and (max-height: 568px) {
@@ -120,4 +122,3 @@ button {
     font-size: 18px;
   }
 }
-

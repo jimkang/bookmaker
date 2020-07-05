@@ -35,21 +35,24 @@ function followRoute({
   friendFigure,
   randomizeJointCount,
   firstPage,
-  lastPage
+  lastPage,
+  stepLimit
 }) {
   if (!seed) {
     seed = new Date().toISOString();
     routeState.addToRoute({ seed });
     return;
   }
+  lastPage = lastPage === 'yes';
+  firstPage = firstPage === 'yes';
 
   var pageFlow = PageFlow({
     seed,
     curve,
     widthToLength: numberizeIfThere(widthToLength),
     forkLengthMin: numberizeIfThere(forkLengthMin),
-    showDevLayers,
-    hideProdLayers,
+    showDevLayers: !lastPage && !firstPage && showDevLayers,
+    hideProdLayers: lastPage || firstPage || hideProdLayers,
     jointCount,
     randomizeNxNLayerColor,
     randomizeCutPathStyle,
@@ -61,8 +64,9 @@ function followRoute({
     figure,
     friendFigure,
     randomizeJointCount,
-    firstPage: firstPage === 'yes',
-    lastPage: lastPage === 'yes'
+    firstPage,
+    lastPage,
+    stepLimit
   });
   wireControls({ pageFlow, clearSeed, hideUI: hideUI === 'yes' });
   pageFlow({ stepMode });

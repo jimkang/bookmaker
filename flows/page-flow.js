@@ -39,7 +39,8 @@ function PageFlow({
   figure = '🐙',
   friendFigure = '🦀',
   firstPage,
-  lastPage
+  lastPage,
+  stepLimit
 }) {
   var random = seedrandom(seed);
   var probable = Probable({ random });
@@ -57,9 +58,7 @@ function PageFlow({
     nodeStep,
     limbStep,
     enmeatenStep,
-    meatPathStep,
-    guyStep,
-    textStep
+    meatPathStep
   ];
 
   var page = {};
@@ -67,6 +66,16 @@ function PageFlow({
   return pageFlow;
 
   function pageFlow({ stepMode = 'continuous' }) {
+    if (lastPage) {
+      document.getElementById('page').style.height = 700;
+    }
+
+    if (!isNaN(stepLimit)) {
+      steps = steps.slice(0, stepLimit);
+    }
+
+    steps = steps.concat([guyStep, textStep]);
+
     if (stepMode === 'continuous') {
       steps.slice(stepIndex).forEach(step => step());
       stepIndex = 0;
@@ -588,9 +597,7 @@ function nodeIsAJunction(node) {
 function otherNodeIdFromLink(node, unwantedNodeId) {
   if (node.links.length !== 2) {
     throw new Error(
-      `otherNodeIdFromLink passed node with ${
-        node.links.length
-      } links; only works if there are two.`
+      `otherNodeIdFromLink passed node with ${node.links.length} links; only works if there are two.`
     );
   }
   return node.links[0] === unwantedNodeId ? node.links[1] : node.links[0];
